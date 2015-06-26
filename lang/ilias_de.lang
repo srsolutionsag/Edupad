@@ -1,0 +1,60 @@
+// 
+// German Language File for eduPadObject Plugin
+//
+
+// Copyright 2011 studer + raimann ag, Waldeggstrasse 47, CH-3097 Liebefeld
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
+<!-- language file start -->
+obj_xpad#:#eduPad
+objs_xpad#:#eduPads
+obj_xpad_duplicate#:#Kopieren
+objs_xpad_duplicate#:#eduPad kopieren
+obj_xpad_select#:#eduPad auswählen
+xpad_add#:#eduPad erstellen
+xpad_new#:#Neues eduPad erstellen
+xpad_read#:#Lesezugriff eduPad
+xpad_write#:#eduPad bearbeiten
+xpad_delete#:#eduPad löschen
+xpad_visible#:#eduPad ist sichtbar
+xpad_edit_permission#:#Rechteeinstellungen ändern
+pad#:#Pad
+crs_create_xpad#:#Neues eduPad anlegen
+grp_create_xpad#:#Neues eduPad anlegen
+fold_create_xpad#:#Neues eduPad anlegen
+root_create_xpad#:#Neues eduPad anlegen
+cat_create_xpad#:#Neues eduPad anlegen
+content#:#Content
+properties#:#Eigenschaften
+edit_properties#:#Eigenschaften bearbeiten
+title#:#Titel
+description#:#Beschreibung
+save#:#Speichern
+cancel#:#Abbrechen
+edit#:#Bearbeiten
+status#:#Status
+offline#:#Offline
+show#:#Zeigen
+accesscode#:#eduPad AccessCode
+proaccount#:#eduPad Pro Account Name
+timeslider#:#TimeSlider
+editfirst#:#Bitte bearbeiten Sie Ihr eduPad zuerst
+onlinefirst#:#Dieses Objekt ist offline. Bitte bearbeiten Sie die Einstellungen 
+hintsafari#:#Sie verwenden Safari als Webbrowser. Dieser Browser wird derzeit nur eingeschränkt unterstützt.
+xpad_import#:#eduPad importieren
+xpad_visible#:#eduPad ist sichtbar
+xpad_read#:#eduPad benutzen
+xpad_write#:#eduPad-Objekt bearbeiten
+xpad_delete#:#eduPad löschen
+xpad_edit_permission#:#Rechteeinstellungen ändern

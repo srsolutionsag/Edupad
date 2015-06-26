@@ -1,0 +1,55 @@
+// 
+// French Language File for eduPadObject Plugin
+//
+
+//Copyright 2011 studer + raimann ag, Waldeggstrasse 47, CH-3097 Liebefeld
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
+<!-- language file start -->
+obj_xpad#:#eduPad
+objs_xpad#:#eduPads
+obj_xpad_duplicate#:#Copier
+objs_xpad_duplicate#:#eduPad copier
+obj_xpad_select#:#eduPad sélectionner
+xpad_add#:#Créer eduPad 
+xpad_new#:#Créer noveau eduPad
+xpad_read#:#Accès eduPad
+xpad_write#:#édition eduPad 
+xpad_delete#:#supprimer eduPad 
+xpad_visible#:#eduPad est visible
+xpad_edit_permission#:#modifier le droit d’accès
+pad#:#Pad
+crs_create_xpad#:#Créer nouveau eduPad
+grp_create_xpad#:#Créer nouveau eduPad
+fold_create_xpad#:#Créer nouveau eduPad
+root_create_xpad#:#Créer nouveau eduPad
+cat_create_xpad#:#Créer nouveau eduPad
+content#:#Contenu
+properties#:#Propriétés
+edit_properties#:#Modifier les propriétés
+title#:#Titre 
+description#:#Description
+save#:#Enregistrer
+cancel#:#Annuler 
+edit#:#Modifier
+status#:#Status
+offline#:#offline
+show#:#Montrer
+accesscode#:#eduPad AccessCode
+proaccount#:#eduPad Pro Account Nom
+timeslider#:#TimeSlider
+editfirst#:# Modifiez d‘abord l‘eduPad s’il vous plaît.
+onlinefirst#:#Cet objet est offline. Modifiez vos propriétés s’il vous plaît. 
+hintsafari#:# Vous utilisez Safari comme webbrowser. Au présent le soutien de ce browser est restreint.
+xpad_import#:#Importer un eduPad

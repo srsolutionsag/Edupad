@@ -1,0 +1,7 @@
+# VERSION 1.0.7 ##############################
+- Subversion
+- Code Cleaning
+- INI-Template
+
+# VERSION 1.0.6 ##############################
+- Fixed: Nach Aufrufen des Pads musste sich der User in ILIAs neu einloggen
