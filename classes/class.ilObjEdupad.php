@@ -13,23 +13,70 @@ require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
  */
 class ilObjEdupad extends ilObjectPlugin {
 
-
 	/**
 	 * @var bool
 	 */
 	protected $scrolling = false;
+	/**
+	 * @var string
+	 */
+	protected $teamhost = '';
+	/**
+	 * @var string
+	 */
+	protected $subdomain = '';
+	/**
+	 * @var string
+	 */
+	protected $teamuser = '';
+	/**
+	 * @var string
+	 */
+	protected $teampassword = '';
+	/**
+	 * @var string
+	 */
+	protected $iliaspadpassword = '';
+	/**
+	 * @var string
+	 */
+	protected $httpprotocol = '';
+	/**
+	 * @var string
+	 */
+	protected $padid = '';
+	/**
+	 * @var string
+	 */
+	protected $padtoken = '';
+	/**
+	 * @var string
+	 */
+	protected $proxy_host = '';
+	/**
+	 * @var string
+	 */
+	protected $proxy_port = '';
+	/**
+	 * @var bool
+	 */
+	protected $use_proxy = false;
+	/**
+	 * @var string
+	 */
+	protected $default_text = '';
 
 
 	/**
 	 * @param int $a_ref_id
 	 */
 	public function __construct($a_ref_id = 0) {
-		/**
-		 * @var $ilDB ilDB
-		 */
-		global $ilDB;
+		$this->readIniFile();
 		parent::__construct($a_ref_id);
-		$this->db = $ilDB;
+	}
+
+
+	protected function readIniFile() {
 		$ini = new ilIniFile('./Customizing/global/plugins/Services/Repository/RepositoryObject/Edupad/edupad.ini.php');
 		$ini->read();
 		$this->setTeamhost($ini->readVariable('hosts', 'teamhost'));
@@ -56,24 +103,35 @@ class ilObjEdupad extends ilObjectPlugin {
 
 
 	public function doCreate() {
+		/**
+		 * @var $ilDB ilDB
+		 */
+		global $ilDB;
 		$pad_id = $this->createEdupad();
-		$this->db->manipulate('INSERT INTO rep_robj_xpad_data ' . '(id, pad_id) VALUES ('
-			. $this->db->quote($this->getId(), 'integer') . ',' . $this->db->quote($pad_id, 'text') . ')');
+		$ilDB->manipulate('INSERT INTO rep_robj_xpad_data ' . '(id, pad_id) VALUES (' . $ilDB->quote($this->getId(), 'integer') . ','
+			. $ilDB->quote($pad_id, 'text') . ')');
 	}
 
 
 	public function doRead() {
-		$set = $this->db->query('SELECT pad_id FROM rep_robj_xpad_data ' . ' WHERE id = '
-			. $this->db->quote($this->getId(), 'integer'));
-		while ($rec = $this->db->fetchObject($set)) {
+		/**
+		 * @var $ilDB ilDB
+		 */
+		global $ilDB;
+		$this->readIniFile();
+		$set = $ilDB->query('SELECT pad_id FROM rep_robj_xpad_data ' . ' WHERE id = ' . $ilDB->quote($this->getId(), 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
 			$this->setPadId($rec->pad_id);
 		}
 	}
 
 
 	public function doDelete() {
-		$this->db->manipulate("DELETE FROM rep_robj_xpad_data WHERE " . " id = "
-			. $this->db->quote($this->getId(), "integer"));
+		/**
+		 * @var $ilDB ilDB
+		 */
+		global $ilDB;
+		$ilDB->manipulate("DELETE FROM rep_robj_xpad_data WHERE " . " id = " . $ilDB->quote($this->getId(), "integer"));
 	}
 
 
@@ -95,10 +153,13 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return array
 	 */
-	function doSearch($pad_id) {
-		$set = $this->db->query('SELECT id FROM rep_robj_xpad_data WHERE pad_id = '
-			. $this->db->quote($pad_id, 'text'));
-		while ($rec = $this->db->fetchObject($set)) {
+	public function doSearch($pad_id) {
+		/**
+		 * @var $ilDB ilDB
+		 */
+		global $ilDB;
+		$set = $ilDB->query('SELECT id FROM rep_robj_xpad_data WHERE pad_id = ' . $ilDB->quote($pad_id, 'text'));
+		while ($rec = $ilDB->fetchObject($set)) {
 			$ilObjects[] = $rec->id;
 		}
 
@@ -109,7 +170,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	/**
 	 * @return string
 	 */
-	private function createEdupad() {
+	protected function createEdupad() {
 		$ch = curl_init();
 		# for debugging
 		curl_setopt($ch, CURLOPT_HEADER, true);
@@ -119,7 +180,8 @@ class ilObjEdupad extends ilObjectPlugin {
 		curl_setopt($ch, CURLOPT_COOKIEFILE, '/dev/null');
 		# follow all redirects
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		# proxy settings
 		if ($this->getUseProxy()) {
 			curl_setopt($ch, CURLOPT_PROXY, $this->getProxyHost());
@@ -128,18 +190,18 @@ class ilObjEdupad extends ilObjectPlugin {
 		}
 		# first, post to get a cookie
 		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/account/sign-in');
-		$result = curl_exec($ch);
+		curl_exec($ch);
+
 		# login;  Pads werden immer mit einem globalen und allgemeinem Teamaccount erzeugt.
 		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/account/sign-in');
 		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,
-			'email=' . urlencode($this->getTeamuser()) . '&password=' . urlencode($this->getTeampassword()));
-		$result = curl_exec($ch);
-		curl_setopt($ch, CURLOPT_URL,
-			$this->getHttpProtocol() . $this->getTeamhost() . '/ep/pad/newpad?defaultText=lorem');
+		curl_setopt($ch, CURLOPT_POSTFIELDS, 'email=' . urlencode($this->getTeamuser()) . '&password=' . urlencode($this->getTeampassword()));
+		curl_exec($ch);
+		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/pad/newpad?defaultText=lorem');
 		curl_setopt($ch, CURLOPT_POST, true);
-		//curl_setopt($ch, CURLOPT_POSTFIELDS, '');
+
 		$result = curl_exec($ch);
+
 		//Auf der HTML-Seite, welche zurückgeliefert wird die globalPadId (z.B. 2$10) suchen und die padId bestimmen.
 		$tmpStr = explode('"globalPadId":"', $result);
 		$tmpStr = explode('"},"colorPalette"', $tmpStr[1]);
@@ -178,15 +240,13 @@ class ilObjEdupad extends ilObjectPlugin {
 		# login
 		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/account/sign-in');
 		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,
-			'email=' . urlencode($this->getTeamuser()) . '&password=' . urlencode($this->getTeampassword()));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, 'email=' . urlencode($this->getTeamuser()) . '&password=' . urlencode($this->getTeampassword()));
 		$result = curl_exec($ch);
-		curl_setopt($ch, CURLOPT_URL,
-			$this->getHttpProtocol() . $this->getTeamhost() . '/ep/admin/account-manager/new');
+		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/admin/account-manager/new');
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS,
-			'email=' . $this->getIliasUser($ilUser) . '@' . $this->getTeamhost() . '&fullName='
-			. $ilUser->getFirstname() . '+' . $ilUser->getLastname() . '&tempPass=B9T7XK&btn=Create+Account');
+			'email=' . $this->getIliasUser($ilUser) . '@' . $this->getTeamhost() . '&fullName=' . $ilUser->getFirstname() . '+'
+			. $ilUser->getLastname() . '&tempPass=B9T7XK&btn=Create+Account');
 		$result = curl_exec($ch);
 	}
 
@@ -218,19 +278,16 @@ class ilObjEdupad extends ilObjectPlugin {
 		# login
 		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/account/sign-in');
 		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,
-			'email=' . urlencode($this->getTeamuser()) . '&password=' . urlencode($this->getTeampassword()));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, 'email=' . urlencode($this->getTeamuser()) . '&password=' . urlencode($this->getTeampassword()));
 		$result = curl_exec($ch);
-		curl_setopt($ch, CURLOPT_URL,
-			$this->getHttpProtocol() . $this->getTeamhost() . '/ep/admin/account-manager/account/' . $edupad_user_id);
+		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/admin/account-manager/account/' . $edupad_user_id);
 		curl_setopt($ch, CURLOPT_HTTPGET, true);
 		$result = curl_exec($ch);
-		curl_setopt($ch, CURLOPT_URL,
-			$this->getHttpProtocol() . $this->getTeamhost() . '/ep/admin/account-manager/account/' . $edupad_user_id);
+		curl_setopt($ch, CURLOPT_URL, $this->getHttpProtocol() . $this->getTeamhost() . '/ep/admin/account-manager/account/' . $edupad_user_id);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS,
-			'newEmail=' . $this->getIliasUser($ilUser) . '@' . $this->getTeamhost() . '&newFullName='
-			. $ilUser->getFirstname() . '+' . $ilUser->getLastname() . '&btn=Save'); //FSX 20110404
+			'newEmail=' . $this->getIliasUser($ilUser) . '@' . $this->getTeamhost() . '&newFullName=' . $ilUser->getFirstname() . '+'
+			. $ilUser->getLastname() . '&btn=Save');
 		$result = curl_exec($ch);
 	}
 
@@ -241,8 +298,8 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @return string
 	 */
 	public function getEdupadHash(ilObjUser $ilUser) {
-		return md5($this->getPadToken() . $this->getIliaspadpassword() . $this->getPadId()
-			. $this->getIliasUser($ilUser) . '@' . $this->GetTeamhost() . $this->getTeamsubdomain());
+		return md5($this->getPadToken() . $this->getIliaspadpassword() . $this->getPadId() . $this->getIliasUser($ilUser) . '@' . $this->GetTeamhost()
+			. $this->getTeamsubdomain());
 	}
 
 
@@ -256,15 +313,12 @@ class ilObjEdupad extends ilObjectPlugin {
 	}
 
 
-	//
-	// Set/Get Methods for our Edupad properties
-	//
 	/**
 	 * Set Teamhost
 	 *
 	 * @param  string $a_val Teamhost e.g plugin.learnonline.iliaspad.ch
 	 */
-	function setTeamhost($a_val) {
+	public function setTeamhost($a_val) {
 		$this->teamhost = $a_val;
 	}
 
@@ -274,7 +328,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string Teamhost e.g plugin.learnonline.iliaspad.ch
 	 */
-	function getTeamhost() {
+	public function getTeamhost() {
 		return $this->teamhost;
 	}
 
@@ -284,7 +338,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param  string $a_val Teamsubdomain e.g devmst3
 	 */
-	function setTeamsubdomain($a_val) {
+	public function setTeamsubdomain($a_val) {
 		$this->subdomain = $a_val;
 	}
 
@@ -294,7 +348,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string Teamhost e.g devmst3
 	 */
-	function getTeamsubdomain() {
+	public function getTeamsubdomain() {
 		return $this->subdomain;
 	}
 
@@ -304,7 +358,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param  string $a_val Teamuser e.g. admin@devmst3.iliaspad.ch
 	 */
-	function setTeamuser($a_val) {
+	public function setTeamuser($a_val) {
 		$this->teamuser = $a_val;
 	}
 
@@ -314,7 +368,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string  Teamuser
 	 */
-	function getTeamuser() {
+	public function getTeamuser() {
 		return $this->teamuser;
 	}
 
@@ -324,7 +378,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param  string $a_val Teampassword e.g. K4Jdh82f, used for login at edupad and creating pads
 	 */
-	function setTeampassword($a_val) {
+	public function setTeampassword($a_val) {
 		$this->teampassword = $a_val;
 	}
 
@@ -334,7 +388,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string  Teampassword
 	 */
-	function getTeampassword() {
+	public function getTeampassword() {
 		return $this->teampassword;
 	}
 
@@ -344,7 +398,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param  string $a_val Iliaspadpassword e.g. K4Jdh82f, used for creating Token
 	 */
-	function setIliaspadpassword($a_val) {
+	public function setIliaspadpassword($a_val) {
 		$this->iliaspadpassword = $a_val;
 	}
 
@@ -354,7 +408,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string  Iliaspadpassword
 	 */
-	function getIliaspadpassword() {
+	public function getIliaspadpassword() {
 		return $this->iliaspadpassword;
 	}
 
@@ -364,7 +418,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param  string $a_val 1,0
 	 */
-	function setHttpProtocol($a_val) {
+	public function setHttpProtocol($a_val) {
 		$this->httpprotocol = $a_val;
 	}
 
@@ -374,7 +428,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string  Iliaspadpassword
 	 */
-	function getHttpProtocol() {
+	public function getHttpProtocol() {
 		return $this->httpprotocol;
 	}
 
@@ -384,7 +438,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param    string $a_val PadId e.g. 12, PadIds of pro Pads are normally integer values
 	 */
-	function setPadId($a_val) {
+	public function setPadId($a_val) {
 		$this->padid = $a_val;
 	}
 
@@ -394,7 +448,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return    string  PadId
 	 */
-	function getPadId() {
+	public function getPadId() {
 		return $this->padid;
 	}
 
@@ -406,7 +460,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @param  string $a_val padtoken
 	 */
-	function setPadToken($a_val) {
+	public function setPadToken($a_val) {
 		$this->padtoken = $a_val;
 	}
 
@@ -416,7 +470,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 *
 	 * @return string  padtoken
 	 */
-	function getPadToken() {
+	public function getPadToken() {
 		return $this->padtoken;
 	}
 
@@ -425,7 +479,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @param $status
 	 */
 	public function setUseProxy($status) {
-		$this->useProxy = (bool)$status;
+		$this->use_proxy = (bool)$status;
 	}
 
 
@@ -433,7 +487,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @return mixed
 	 */
 	public function getUseProxy() {
-		return $this->useProxy;
+		return $this->use_proxy;
 	}
 
 
@@ -441,7 +495,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @param $host
 	 */
 	public function setProxyHost($host) {
-		$this->host = $host;
+		$this->proxy_host = $host;
 	}
 
 
@@ -449,7 +503,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @return mixed
 	 */
 	public function getProxyHost() {
-		return $this->host;
+		return $this->proxy_host;
 	}
 
 
@@ -457,7 +511,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @param $port
 	 */
 	public function setProxyPort($port) {
-		$this->port = $port;
+		$this->proxy_port = $port;
 	}
 
 
@@ -465,15 +519,15 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @return mixed
 	 */
 	public function getProxyPort() {
-		return $this->port;
+		return $this->proxy_port;
 	}
 
 
 	/**
-	 * @param $defaultText
+	 * @param $default_text
 	 */
-	public function setDefaultText($defaultText) {
-		$this->defaultText = $defaultText;
+	public function setDefaultText($default_text) {
+		$this->default_text = $default_text;
 	}
 
 
@@ -481,7 +535,7 @@ class ilObjEdupad extends ilObjectPlugin {
 	 * @return mixed
 	 */
 	public function getDefaultText() {
-		return $this->defaultText;
+		return $this->default_text;
 	}
 
 
