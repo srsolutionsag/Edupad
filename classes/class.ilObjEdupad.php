@@ -180,7 +180,7 @@ class ilObjEdupad extends ilObjectPlugin {
 		curl_setopt($ch, CURLOPT_COOKIEFILE, '/dev/null');
 		# follow all redirects
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		# proxy settings
 		if ($this->getUseProxy()) {
@@ -226,8 +226,9 @@ class ilObjEdupad extends ilObjectPlugin {
 		# parse cookies
 		curl_setopt($ch, CURLOPT_COOKIEFILE, '/dev/null');
 		# follow all redirects
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
 		# proxy settings
 		if ($this->getUseProxy()) {
 			curl_setopt($ch, CURLOPT_PROXY, $this->getProxyHost());
