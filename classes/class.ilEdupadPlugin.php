@@ -20,6 +20,10 @@ class ilEdupadPlugin extends ilRepositoryObjectPlugin {
 	public function getPluginName() {
 		return 'Edupad';
 	}
+
+	public function uninstallCustom() {
+
+	}
 }
 
 ?>
