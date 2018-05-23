@@ -52,4 +52,6 @@ proaccount#:#eduPad Pro Account Name
 timeslider#:#TimeSlider
 editfirst#:#Please edit your eduPad
 onlinefirst#:#This Object is offline. Please edit the Properties
-hintsafari#:#You can't use eduPad with the with the Safari browser 
+hintsafari#:#You can't use eduPad with the with the Safari browser
+xpad_migration_info#:#The plugin ‘eduPad’ will be turned of at the end of July 2018. Therefore please migrate until the end of July 2018 all Content from this eduPad to a new obect ‘Etherpad’. After August 2018 the access on this object is no longer possible. You can find an instruction here:
+xpad_migration_info_pdf_instruction#:#PDF instruction

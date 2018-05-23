@@ -200,6 +200,7 @@ class ilObjEdupadGUI extends ilObjectPluginGUI {
 	 * @param $type
 	 */
 	protected function buildFrame($type) {
+		ilUtil::sendInfo($this->pl->txt('xpad_migration_info') . ' <a href=' . ilLink::_getStaticLink(18017, "file", true, "_download") . '>' . $this->pl->txt("xpad_migration_info_pdf_instruction") . '</a>', true);
 		if ($type == 'pad') {
 			$this->tabs->activateTab('edit');
 		} elseif ($type == 'slider') {

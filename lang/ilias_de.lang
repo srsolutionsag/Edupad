@@ -58,3 +58,5 @@ xpad_read#:#eduPad benutzen
 xpad_write#:#eduPad-Objekt bearbeiten
 xpad_delete#:#eduPad löschen
 xpad_edit_permission#:#Rechteeinstellungen ändern
+xpad_migration_info#:#Die Erweiterung ‘eduPad’ wird Ende Juli 2018 abgeschaltet. Bitte migrieren Sie daher bis Ende Juli 2018 die Inhalte aus diesem eduPad in ein neues Objekt ‘Etherpad’. Ab August 2018 ist der Zugriff auf dieses Objekt nicht mehr möglich. Eine Anleitung finden Sie unter:
+xpad_migration_info_pdf_instruction#:#PDF Anleitung
